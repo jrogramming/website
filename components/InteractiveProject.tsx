@@ -242,7 +242,7 @@ const InteractiveProject: React.FC<InteractiveProjectProps> = ({ type, title, de
   const [isActive, setIsActive] = useState(false);
 
   return (
-    <div className={`w-full ${isActive && type === 'game' ? 'h-96' : 'h-64'} transition-all duration-300 border-4 border-pink-100 bg-white relative shadow-sm group overflow-hidden`}>
+    <div className={`w-full ${isActive && type === 'game' ? 'aspect-square' : 'h-64'} transition-all duration-300 border-4 border-pink-100 bg-white relative shadow-sm group overflow-hidden`}>
       
       {/* Inactive State: Cartridge View */}
       {!isActive && (

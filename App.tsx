@@ -202,7 +202,7 @@ const App: React.FC = () => {
                             ))}
                           </div>
                           {project.link && (
-                            <a href={project.link} className="block w-full text-center bg-gray-800 text-white font-pixel text-[0.6rem] py-3 hover:bg-pink-dark transition-colors border-2 border-black">
+                            <a href={project.link} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-gray-800 text-white font-pixel text-[0.6rem] py-3 hover:bg-pink-dark transition-colors border-2 border-black">
                               VIEW SOURCE CODE
                             </a>
                           )}

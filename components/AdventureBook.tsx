@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Experience } from '../types';
-import { MapPin, Calendar, Briefcase, Building2 } from 'lucide-react';
+import { MapPin, Calendar, Building2 } from 'lucide-react';
 
 interface AdventureBookProps {
   experiences: Experience[];
@@ -13,13 +13,22 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
   const totalPages = experiences.length;
   const currentExp = experiences[currentIndex];
 
-  const handleNext = () => {
+  // Logic:
+  // Array is [Newest (Index 0) ... Oldest (Index N)]
+  // We want Page 7 (Quest 7) to be Index 0.
+  // We want Page 1 (Quest 1) to be Index N.
+  
+  // "Previous Page" (e.g., Page 7 -> Page 6)
+  // This means moving to an OLDER quest (Index 0 -> Index 1)
+  const goToPreviousPage = () => {
     if (currentIndex < totalPages - 1) {
       triggerFlip(() => setCurrentIndex(prev => prev + 1));
     }
   };
 
-  const handlePrev = () => {
+  // "Next Page" (e.g., Page 6 -> Page 7)
+  // This means moving to a NEWER quest (Index 1 -> Index 0)
+  const goToNextPage = () => {
     if (currentIndex > 0) {
       triggerFlip(() => setCurrentIndex(prev => prev - 1));
     }
@@ -32,6 +41,8 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
       setIsFlipping(false);
     }, 300);
   };
+
+  const currentPageNumber = totalPages - currentIndex;
 
   return (
     <div className="w-full max-w-4xl mx-auto font-body">
@@ -50,7 +61,7 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
             
             <div className="mb-6">
               <span className="font-pixel text-[0.6rem] text-pink-500 bg-pink-100 px-2 py-1 border border-pink-200 uppercase tracking-widest">
-                Quest #{totalPages - currentIndex}
+                Quest #{currentPageNumber}
               </span>
             </div>
 
@@ -103,25 +114,46 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
 
             {/* Pagination Number (Right Page Bottom) */}
             <div className="mt-auto pt-4 text-right font-pixel text-[0.6rem] text-gray-400">
-              Page {currentIndex + 1} / {totalPages}
+              Page {currentPageNumber} / {totalPages}
             </div>
           </div>
 
         </div>
 
-        {/* --- Navigation Controls (Outside Pages) --- */}
+        {/* --- Navigation Controls --- */}
+
+        {/* MOBILE CONTROLS (Below Pages) */}
+        <div className="flex md:hidden justify-between items-center mt-4 px-2">
+           <button 
+              onClick={goToPreviousPage}
+              disabled={currentIndex === totalPages - 1}
+              className={`flex items-center gap-2 font-pixel text-xs text-white bg-gray-800 px-4 py-3 border-2 border-black shadow-pixel active:translate-y-1 active:shadow-none transition-all ${currentIndex === totalPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+           >
+              <span>◄</span> PREV
+           </button>
+
+           <button 
+              onClick={goToNextPage}
+              disabled={currentIndex === 0}
+              className={`flex items-center gap-2 font-pixel text-xs text-white bg-gray-800 px-4 py-3 border-2 border-black shadow-pixel active:translate-y-1 active:shadow-none transition-all ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+           >
+              NEXT <span>►</span>
+           </button>
+        </div>
         
-        {/* Prev Button */}
+        {/* DESKTOP CONTROLS (Floating Side Ears) */}
+        
+        {/* Left Arrow: Previous Page (Lower Number, Older Quest) */}
         <button 
-          onClick={handlePrev}
-          disabled={currentIndex === 0}
+          onClick={goToPreviousPage}
+          disabled={currentIndex === totalPages - 1}
           className={`
-            absolute top-1/2 -left-4 md:-left-12 -translate-y-1/2 
+            hidden md:block absolute top-1/2 -left-12 -translate-y-1/2 z-20
             bg-white border-4 border-gray-800 p-3 shadow-pixel 
             hover:bg-gray-50 transition-all active:translate-y-1 active:shadow-none
-            ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-x-1 cursor-pointer'}
+            ${currentIndex === totalPages - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-x-1 cursor-pointer'}
           `}
-          title="Previous Quest"
+          title="Previous Page (Older Quest)"
         >
           {/* Pixel Left Arrow */}
           <svg width="20" height="20" viewBox="0 0 10 10" fill="none" className="transform rotate-180">
@@ -130,17 +162,17 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
           </svg>
         </button>
 
-        {/* Next Button */}
+        {/* Right Arrow: Next Page (Higher Number, Newer Quest) */}
         <button 
-          onClick={handleNext}
-          disabled={currentIndex === totalPages - 1}
+          onClick={goToNextPage}
+          disabled={currentIndex === 0}
           className={`
-            absolute top-1/2 -right-4 md:-right-12 -translate-y-1/2 
+            hidden md:block absolute top-1/2 -right-12 -translate-y-1/2 z-20
             bg-white border-4 border-gray-800 p-3 shadow-pixel 
             hover:bg-gray-50 transition-all active:translate-y-1 active:shadow-none
-            ${currentIndex === totalPages - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:translate-x-1 cursor-pointer'}
+            ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:translate-x-1 cursor-pointer'}
           `}
-          title="Next Quest"
+          title="Next Page (Newer Quest)"
         >
           {/* Pixel Right Arrow */}
           <svg width="20" height="20" viewBox="0 0 10 10" fill="none">
@@ -150,8 +182,6 @@ const AdventureBook: React.FC<AdventureBookProps> = ({ experiences }) => {
         </button>
 
       </div>
-      
-      {/* Decorative "Desk" elements behind the book could go here */}
     </div>
   );
 };
